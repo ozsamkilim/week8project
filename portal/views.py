@@ -1,23 +1,36 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Q
+from .models import Person
 
-from .models import PersonStatus
+from .models import PersonStatus,Person
+from .forms import NameForm
+
 
 def index(request):
 	return render(request, 'portal/index.html')
 
 
 def add_person(request):
-    # if request.method == 'POST':
-        # ...
-        # return redirect('portal:index')
-    return render(request, 'portal/add_person.html')
+    form = NameForm()
+    if request.method == 'POST':
+        form = NameForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            first_name = data['first_name']
+            last_name = data['first_name']
+            new_person= Person(first_name=first_name, last_name=last_name)
+            new_person.save()
+            
+        return redirect('portal:index')
+    return render(request, 'portal/add_person.html', {'form':form})
 
 
-def show_person(request, person_id):
-    # ... 
-    pass
-
+def show_person(request):
+    person = Person.objects.all()
+    context={'person':person}
+    print(context)
+    return render(request , 'portal/show_person.html', context)
+    
 
 def show_safe_persons(request):
     persons = None # ... change this line!
